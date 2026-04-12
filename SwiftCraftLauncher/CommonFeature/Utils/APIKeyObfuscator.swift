@@ -58,8 +58,14 @@ enum Obfuscator {
         // 将加密字符串按固定长度分割
         var parts: [String] = []
         for i in 0..<numParts {
-            let startIndex = encryptedString.index(encryptedString.startIndex, offsetBy: i * partLength)
-            let endIndex = min(encryptedString.index(startIndex, offsetBy: partLength), encryptedString.endIndex)
+            let startOffset = i * partLength
+            // 添加越界保护
+            guard startOffset < encryptedString.count else {
+                parts.append("")
+                continue
+            }
+            let startIndex = encryptedString.index(encryptedString.startIndex, offsetBy: startOffset)
+            let endIndex = encryptedString.index(startIndex, offsetBy: partLength, limitedBy: encryptedString.endIndex) ?? encryptedString.endIndex
             let part = String(encryptedString[startIndex..<endIndex])
             parts.append(part)
         }
